@@ -33,12 +33,10 @@ const useTodos = (initialTodos: Todo[] = []) => {
   const [todos, dispatch] = useReducer(todoReducer, initialTodos);
 
   useEffect(() => {
-    console.log('Fetching todos from localStorage...');
     const savedTodos = localStorage.getItem('todos');
     if (savedTodos) {
       try {
-        const parsedTodos = JSON.parse(savedTodos);
-        console.log('Parsed todos:', parsedTodos);
+        const parsedTodos: Todo[] = JSON.parse(savedTodos);
         dispatch({ type: 'SET_TODOS', todos: parsedTodos });
       } catch (error) {
         console.error('Error parsing todos from localStorage:', error);
@@ -47,7 +45,6 @@ const useTodos = (initialTodos: Todo[] = []) => {
   }, []);
 
   useEffect(() => {
-    console.log('Saving todos to localStorage...', todos);
     try {
       localStorage.setItem('todos', JSON.stringify(todos));
     } catch (error) {
