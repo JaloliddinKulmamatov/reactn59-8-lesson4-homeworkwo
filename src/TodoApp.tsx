@@ -21,6 +21,13 @@ const TodoApp: React.FC = () => {
     if (text.trim() !== '') {
       dispatch({ type: 'ADD_TODO', text });
       setText('');
+      Swal.fire({
+        position: 'top-end',
+        icon: 'success',
+        title: 'You have saved the new todo',
+        showConfirmButton: false,
+        timer: 500
+      });
     }
   };
 
@@ -40,7 +47,7 @@ const TodoApp: React.FC = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         dispatch({ type: 'REMOVE_TODO', id });
-        Swal.fire('Deleted!', 'Your file has been deleted.', 'success');
+        Swal.fire('Deleted!', 'Your todo has been deleted.', 'success');
       }
     });
   };
@@ -50,7 +57,7 @@ const TodoApp: React.FC = () => {
   }
 
   const TodoItem: React.FC<{ todo: Todo; onToggle: () => void; onRemove: () => void }> = ({ todo, onToggle, onRemove }) => (
-    <li className={`bg-gray-800 p-4 rounded-lg flex justify-between items-center ${todo.completed ? 'border-green-500' : 'border-purple-500'}`}>
+    <li className={`bg-gray-800 p-4 rounded-lg flex justify-between items-center border ${todo.completed ? 'border-green-500' : 'border-purple-500'}`}>
       <span
         style={{ textDecoration: todo.completed ? 'line-through' : 'none' }}
         className={`cursor-pointer ${todo.completed ? 'text-green-300' : 'text-purple-300'} transition-all duration-300`}
