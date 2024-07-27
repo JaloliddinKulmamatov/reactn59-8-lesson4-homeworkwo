@@ -61,7 +61,7 @@ const TodoApp: React.FC = () => {
       <span className="flex items-center gap-2">
         <button
           onClick={onToggle}
-          className={`p-3 rounded-lg hover:${todo.completed ? 'bg-sky-600' : 'bg-emerald-400'} transition-all duration-300 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`p-3 rounded-lg ${todo.completed ? 'hover:bg-sky-600' : 'hover:bg-emerald-400'} transition-all duration-300 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
           disabled={loading}
         >
           {todo.completed ? <IoReturnUpBackOutline /> : <FaCheck />}
@@ -117,10 +117,6 @@ const TodoApp: React.FC = () => {
           />
         ))}
       </ul>
-
-      <footer className='bg-slate-600 fixed bottom-0 p-8 w-screen'>
-       <h1>Assalomu aleykum ustoz.Ustoz men sweetalert,responsive,loading,style(hover,border) va return button qo'shganman</h1>
-      </footer>
     </div>
   );
 };
