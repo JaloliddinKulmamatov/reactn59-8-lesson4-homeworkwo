@@ -4,36 +4,78 @@ import { FaRegTrashAlt, FaCheck } from 'react-icons/fa';
 import { IoReturnUpBackOutline } from "react-icons/io5";
 import { IoMdAdd } from "react-icons/io";
 import Loading from './Loading';
+import Swal from 'sweetalert2';
 
 const TodoApp: React.FC = () => {
   const [todos, dispatch] = useTodos();
   const [text, setText] = useState('');
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setTimeout(() => {
       setLoading(false);
-    }, 2000); 
+    }, 2000);
   }, []);
 
   const addTodo = () => {
     if (text.trim() !== '') {
-        dispatch({ type: 'ADD_TODO', text });
-        setText('');
+      dispatch({ type: 'ADD_TODO', text });
+      setText('');
     }
   };
 
   const toggleTodo = (id: number) => {
-      dispatch({ type: 'TOGGLE_TODO', id });
+    dispatch({ type: 'TOGGLE_TODO', id });
   };
 
   const removeTodo = (id: number) => {
-      dispatch({ type: 'REMOVE_TODO', id });
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch({ type: 'REMOVE_TODO', id });
+        Swal.fire('Deleted!', 'Your file has been deleted.', 'success');
+      }
+    });
   };
 
   if (loading) {
     return <Loading />;
   }
+
+  const TodoItem: React.FC<{ todo: Todo; onToggle: () => void; onRemove: () => void }> = ({ todo, onToggle, onRemove }) => (
+    <li className={`bg-gray-800 p-4 rounded-lg flex justify-between items-center ${todo.completed ? 'border-green-500' : 'border-purple-500'}`}>
+      <span
+        style={{ textDecoration: todo.completed ? 'line-through' : 'none' }}
+        className={`cursor-pointer ${todo.completed ? 'text-green-300' : 'text-purple-300'} transition-all duration-300`}
+        onClick={onToggle}
+      >
+        {todo.text}
+      </span>
+      <span className="flex items-center gap-2">
+        <button
+          onClick={onToggle}
+          className={`p-3 rounded-lg hover:${todo.completed ? 'bg-sky-600' : 'bg-emerald-400'} transition-all duration-300 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+          disabled={loading}
+        >
+          {todo.completed ? <IoReturnUpBackOutline /> : <FaCheck />}
+        </button>
+        <button
+          onClick={onRemove}
+          className={`text-white p-3 rounded-lg hover:bg-red-600 transition-all duration-300 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+          disabled={loading}
+        >
+          <FaRegTrashAlt />
+        </button>
+      </span>
+    </li>
+  );
 
   return (
     <div className="bg-gray-900 text-white min-h-screen py-10 px-4">
@@ -47,80 +89,38 @@ const TodoApp: React.FC = () => {
         />
         <button
           onClick={addTodo}
-          className={`bg-purple-500 text-white p-3 rounded-lg border  hover:bg-blue-600 hover:border-purple-600 transition-all duration-300 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`bg-purple-500 text-white p-3 rounded-lg hover:bg-blue-600 transition-all duration-300 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
           disabled={loading}
         >
-         <IoMdAdd />
+          <IoMdAdd />
         </button>
       </div>
-      <h2 className="text-xl font-semibold mb-4">Active Todos: {todos.length}</h2>
+      <h2 className="text-xl font-semibold mb-4">Active Todos: {todos.filter(todo => !todo.completed).length}</h2>
       <ul className="space-y-4">
-        {todos.filter(todo => !todo.completed).map((todo: Todo) => (
-          <li
+        {todos.filter(todo => !todo.completed).map((todo) => (
+          <TodoItem
             key={todo.id}
-            className="bg-gray-800 p-4 rounded-lg flex justify-between items-center border border-purple-500"
-          >
-            <span
-              style={{ textDecoration: todo.completed ? 'line-through' : 'none' }}
-              className=" cursor-pointer text-purple-300 transition-all duration-300"
-              onClick={() => toggleTodo(todo.id)}
-            >
-              {todo.text}
-            </span>
-            <span className="flex items-center gap-2">
-              <button
-                onClick={() => toggleTodo(todo.id)}
-                className={`p-3 rounded-lg hover:bg-emerald-400 transition-all duration-300 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                disabled={loading}
-              >
-                <FaCheck />
-              </button>
-              <button
-                onClick={() => removeTodo(todo.id)}
-                className={`text-white p-3 rounded-lg hover:bg-red-600 transition-all duration-300 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                disabled={loading}
-              >
-                <FaRegTrashAlt />
-              </button>
-            </span>
-          </li>
+            todo={todo}
+            onToggle={() => toggleTodo(todo.id)}
+            onRemove={() => removeTodo(todo.id)}
+          />
         ))}
       </ul>
-      <h2 className="text-xl font-semibold mt-8 mb-4">Completed Todos: {todos.length}</h2>
+      <h2 className="text-xl font-semibold mt-8 mb-4">Completed Todos: {todos.filter(todo => todo.completed).length}</h2>
       <ul className="space-y-4">
-        {todos.filter(todo => todo.completed).map((todo: Todo) => (
-          <li
+        {todos.filter(todo => todo.completed).map((todo) => (
+          <TodoItem
             key={todo.id}
-            className="bg-gray-800 p-4 rounded-lg flex justify-between items-center border border-green-500"
-          >
-            <span
-              style={{ textDecoration: todo.completed ? 'line-through' : 'none' }}
-              className="t cursor-pointer text-green-300 transition-all duration-300"
-              onClick={() => toggleTodo(todo.id)}
-            >
-              {todo.text}
-            </span>
-            <span>
-            <button
-              onClick={() => toggleTodo(todo.id)}
-              className={`text-white p-3 rounded-lg hover:bg-sky-600 transition-all duration-300 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-              disabled={loading}
-              >
-              <IoReturnUpBackOutline />
-            </button>
-            <button
-              onClick={() => removeTodo(todo.id)}
-              className={`text-white p-3 rounded-lg hover:bg-red-600 transition-all duration-300 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-              disabled={loading}
-            >
-              <FaRegTrashAlt />
-            </button>
-
-            </span>
-
-          </li>
+            todo={todo}
+            onToggle={() => toggleTodo(todo.id)}
+            onRemove={() => removeTodo(todo.id)}
+          />
         ))}
       </ul>
+
+      <footer className='bg-slate-600 fixed bottom-0 p-8 w-screen'>
+       <h1>Assalomu aleykum ustoz.Ustoz men sweetalert,responsive,loading,style(hover,border) va return button qo'shganman</h1>
+      </footer>
     </div>
   );
 };
