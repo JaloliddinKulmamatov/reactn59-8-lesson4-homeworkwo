@@ -124,7 +124,7 @@ const TodoApp: React.FC = () => {
           />
         ))}
       </ul>
-      <footer className='bg-slate-700 w-screen'>
+      <footer className='bg-slate-700 w-screen fixed bottom-0 p-3'>
         <h1>Ustoz menda localStorage ishlaydi va responsive bor</h1>
       </footer>
     </div>
